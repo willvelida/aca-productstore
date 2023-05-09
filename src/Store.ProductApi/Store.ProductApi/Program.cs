@@ -35,3 +35,6 @@ public class Product
     public string ProductName { get; set; }
     public string Manufacturer { get; set; }
 }
+
+// Make the implicit Program class public so test projects can access it
+public partial class Program { }
