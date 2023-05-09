@@ -1,11 +1,11 @@
-name: Build and Deploy Store App
+name: Build and Deploy Inventory API
 
 on:
   workflow_dispatch:
 
 defaults:
   run:
-    working-directory: ./src/Store.Web
+    working-directory: ./src/Store.InventoryApi
 
 jobs:
   build-container-image:
@@ -41,8 +41,8 @@ jobs:
           username: ${{ steps.getacrname.outputs.acrName }}
           password: ${{ steps.getacrcreds.outputs.password }}
       - run: |
-          docker build . -t ${{ steps.getacrcreds.outputs.loginServer }}/store:${{ github.sha }}
-          docker push ${{ steps.getacrcreds.outputs.loginServer }}/store:${{ github.sha }}
+          docker build . -t ${{ steps.getacrcreds.outputs.loginServer }}/inventoryapi:${{ github.sha }}
+          docker push ${{ steps.getacrcreds.outputs.loginServer }}/inventoryapi:${{ github.sha }}
   deploy-api-image:
     runs-on: ubuntu-latest
     needs: build-container-image
@@ -67,4 +67,4 @@ jobs:
             echo "Installing containerapp extension"
             az extension add -n containerapp --yes
             echo "Starting Deploying"
-            az containerapp update -n store-web -g ${{ secrets.AZURE_RG }} -i ${{ steps.getacrserver.outputs.loginServer }}/store:${{ github.sha }} --debug
+            az containerapp update -n store-inventory-api -g ${{ secrets.AZURE_RG }} -i ${{ steps.getacrserver.outputs.loginServer }}/inventoryapi:${{ github.sha }} --debug
