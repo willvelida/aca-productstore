@@ -84,7 +84,7 @@ jobs:
             echo "Installing containerapp extension"
             az extension add -n containerapp --yes
             echo "Creating Blue Slot"
-            az containerapp revision copy -n store-product-api -g ${{ secrets.AZURE_RG }} -i ${{ steps.getacrserver.outputs.loginServer }}/weatherapi:${{ github.sha }}
+            az containerapp revision copy -n store-product-api -g ${{ secrets.AZURE_RG }} -i ${{ steps.getacrserver.outputs.loginServer }}/productapi:${{ github.sha }}
             az containerapp ingress traffic set -n store-product-api -g ${{ secrets.AZURE_RG }} --revision-weight ${{ steps.getcurrentrevisionname.outputs.currentRevision }}=100
       
       - name: 'Get Blue Slot URL'
