@@ -14,7 +14,7 @@ param containerAppEnvironmentName string = '${applicationName}env'
 param containerRegistryName string = '${applicationName}acr'
 
 @description('The image used by this Container App')
-param containerImageName string = 'mcr.microsoft.com/azuredocs/containerapps-helloworld:latest'
+param containerImageName string
 
 var appName = 'store-inventory-api'
 var tags = {
