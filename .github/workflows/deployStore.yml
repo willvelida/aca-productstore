@@ -39,7 +39,7 @@ jobs:
         run: |
           echo "Installing containerapp extension"
           az extension add -n containerapp --yes
-          containerImage=$(az containerapp show --name storeweb --resource-group ${{ secrets.AZURE_RG }} --query "properties.template.containers[0].image" -o tsv)  
+          containerImage=$(az containerapp show --name store-web --resource-group ${{ secrets.AZURE_RG }} --query "properties.template.containers[0].image" -o tsv)  
           echo "::set-output name=containerImage::$containerImage"
 
       - name: Run preflight validation
