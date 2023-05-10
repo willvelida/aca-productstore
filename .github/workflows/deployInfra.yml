@@ -1,0 +1,74 @@
+name: Deploy sample infrastructure
+
+on:
+  workflow_dispatch:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Sign into Azure
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Lint Bicep
+        uses: Azure/cli@v1
+        with:
+          inlineScript: |
+            az bicep build --file ./deploy/main.bicep
+
+  validate:
+    needs: lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Sign into Azure
+        uses: azure/login@v1
+        with:
+            creds: ${{ secrets.AZURE_CREDENTIALS }}
+      - name: Run preflight validation
+        uses: azure/arm-deploy@v1
+        with:
+            deploymentName: ${{ github.run_number }}
+            resourceGroupName: ${{ secrets.AZURE_RG }}
+            template: ./deploy/main.bicep
+            deploymentMode: Validate
+            
+  preview:
+    needs: [lint, validate]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: azure/login@v1
+        name: Sign into Azure
+        with:
+            creds: ${{ secrets.AZURE_CREDENTIALS }}
+    
+      - uses: Azure/cli@v1
+        name: Run what-if
+        with:
+            inlineScript: |
+                az deployment group what-if --resource-group ${{ secrets.AZURE_RG }} --template-file ./deploy/main.bicep
+
+  deploy-infra:
+    runs-on: ubuntu-latest
+    environment: Production
+    needs: preview
+    steps:
+      - uses: actions/checkout@v2          
+      - name: Sign into Azure
+        uses: azure/login@v1
+        with:
+            creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Deploy Bicep Template
+        uses: azure/arm-deploy@v1
+        with:
+            deploymentName: ${{ github.run_number }}
+            resourceGroupName: ${{ secrets.AZURE_RG }}
+            template: ./deploy/main.bicep
+            deploymentMode: Incremental
+
