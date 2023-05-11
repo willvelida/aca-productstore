@@ -17,14 +17,14 @@ docker push $ACR_LOGIN_SERVER/productapi:latest
 
 # Get current revision
 az extension add --name containerapp --upgrade
-CURRENT_REVISION=$(az containerapp revision list -g ${{ secrets.AZURE_RG }} -n store-product-api --query 'reverse(sort_by([].{Revision:name,Replicas:properties.replicas,Active:properties.active,Created:properties.createdTime,FQDN:properties.fqdn}[?Active!=`false`], &Created))| [0].Revision' -o tsv)
+CURRENT_REVISION=$(az containerapp revision list -g $RG_NAME -n store-product-api --query 'reverse(sort_by([].{Revision:name,Replicas:properties.replicas,Active:properties.active,Created:properties.createdTime,FQDN:properties.fqdn}[?Active!=`false`], &Created))| [0].Revision' -o tsv)
 
 # Create blue slot and set ingress traffic to 0
 az containerapp revision copy -n store-product-api -g $RG_NAME -i $ACR_LOGIN_SERVER/productapi:latest
 az containerapp ingress traffic set -n store-product-api -g $RG_NAME --revision-weight $CURRENT_REVISION=100
 
 # Get Blue Slot URL
-BLUE_SLOT_URL=$(az containerapp revision list -g ${{ secrets.AZURE_RG }} -n store-product-api --query 'reverse(sort_by([].{Revision:name,Replicas:properties.replicas,Active:properties.active,Created:properties.createdTime,FQDN:properties.fqdn}[?Active!=`false`], &Created))| [0].FQDN' -o tsv)
+BLUE_SLOT_URL=$(az containerapp revision list -g $RG_NAME -n store-product-api --query 'reverse(sort_by([].{Revision:name,Replicas:properties.replicas,Active:properties.active,Created:properties.createdTime,FQDN:properties.fqdn}[?Active!=`false`], &Created))| [0].FQDN' -o tsv)
 
 # cd into Integration Tests, and pass in URL to run them
 dotnet test --no-build --verbosity normal  --logger trx --environment BLUE_SLOT_URL="$BLUE_SLOT_URL/products"
