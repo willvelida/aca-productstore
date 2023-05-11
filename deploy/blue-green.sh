@@ -16,7 +16,7 @@ docker build - -t $ACR_LOGIN_SERVER/productapi:latest
 docker push $ACR_LOGIN_SERVER/productapi:latest
 
 # Get current revision
-az extension add -n container-app --yes
+az extension add --name containerapp --upgrade
 CURRENT_REVISION=$(az containerapp revision list -g ${{ secrets.AZURE_RG }} -n store-product-api --query 'reverse(sort_by([].{Revision:name,Replicas:properties.replicas,Active:properties.active,Created:properties.createdTime,FQDN:properties.fqdn}[?Active!=`false`], &Created))| [0].Revision' -o tsv)
 
 # Create blue slot and set ingress traffic to 0
