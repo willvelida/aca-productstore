@@ -77,4 +77,5 @@ jobs:
           acrUsername: ${{ steps.getacrcreds.outputs.loginName }}
           acrPassword: ${{ steps.getacrcreds.outputs.password }}
           containerAppName: store-web
+          resourceGroup: ${{ secrets.AZURE_RG }}
       
