@@ -81,6 +81,19 @@ resource productApi 'Microsoft.App/containerApps@2022-11-01-preview' = {
               value: appInsights.properties.ConnectionString
             }
           ]
+          probes: [
+            {
+              type: 'Liveness'
+              httpGet: {
+                port: 80
+                path: '/healthz/liveness'
+              }
+              initialDelaySeconds: 15
+              periodSeconds: 30
+              failureThreshold: 3
+              timeoutSeconds: 1
+            }
+          ]
         }
       ]
       scale: {

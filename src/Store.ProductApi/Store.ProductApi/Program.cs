@@ -1,4 +1,6 @@
 using Bogus;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,6 +28,17 @@ var products = new Faker<Product>()
 app.MapGet("/products", () => Results.Ok(products))
     .Produces<Product[]>(StatusCodes.Status200OK)
     .WithName("GetProducts");
+
+// Health Check
+app.MapHealthChecks("/healthz/liveness", new HealthCheckOptions()
+{
+    ResultStatusCodes =
+    {
+        [HealthStatus.Healthy] = StatusCodes.Status200OK,
+        [HealthStatus.Degraded] = StatusCodes.Status200OK,
+        [HealthStatus.Unhealthy] = StatusCodes.Status500InternalServerError,
+    }
+});
 
 app.Run();
 
