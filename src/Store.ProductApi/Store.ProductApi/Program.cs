@@ -20,7 +20,7 @@ var products = new Faker<Product>()
     .StrictMode(true)
     .RuleFor(p => p.ProductId, (f, p) => f.Database.Random.Guid())
     .RuleFor(p => p.ProductName, (f, p) => f.Commerce.ProductName())
-    .RuleFor(p => p.Manufacturer, (f, p) => f.Company.CompanyName())
+    .RuleFor(p => p.Manufacturer, (f, p) => "")
     .Generate(10);
 
 app.MapGet("/products", () => Results.Ok(products))
