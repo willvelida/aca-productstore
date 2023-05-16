@@ -16,6 +16,9 @@ param appInsightsName string = '${applicationName}ai'
 @description('Specifies the name of the Container App Environment')
 param containerAppEnvironmentName string = '${applicationName}env'
 
+@description('Specifies the name of the Azure Load Test resource')
+param loadTestName string = '${applicationName}loadtest'
+
 var tags = {
   Environment: 'Production'
   ApplicationName: 'aca-productstore'
@@ -74,5 +77,13 @@ resource env 'Microsoft.App/managedEnvironments@2022-03-01' = {
         sharedKey: logAnalytics.listKeys().primarySharedKey
       }
     }
+  }
+}
+
+resource loadTest 'Microsoft.LoadTestService/loadTests@2022-12-01' = {
+  name: loadTestName
+  location: location
+  properties: {
+    
   }
 }
