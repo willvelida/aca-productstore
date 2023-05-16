@@ -16,9 +16,13 @@ param containerRegistryName string = '${applicationName}acr'
 @description('The image used by this Container App')
 param containerImageName string = 'mcr.microsoft.com/azuredocs/containerapps-helloworld:latest'
 
+@description('The name of the Action Group that will receive alerts for this application')
+param actionGroupName string = 'PSOC team'
+
 var appName = 'store-web'
 var inventoryAppName = 'store-inventory-api'
 var productAppName = 'store-product-api'
+var replicaCountExceededAlertName = '${appName} replica count exceeded 8'
 var tags = {
   Environment: 'Production'
   ApplicationName: 'aca-productstore'
@@ -42,6 +46,10 @@ resource productsApp 'Microsoft.App/containerApps@2022-11-01-preview' existing =
 
 resource inventoryApp 'Microsoft.App/containerApps@2022-11-01-preview' existing = {
   name: inventoryAppName
+}
+
+resource actionGroup 'Microsoft.Insights/actionGroups@2023-01-01' existing = {
+  name: actionGroupName
 }
 
 resource productApi 'Microsoft.App/containerApps@2022-11-01-preview' = {
@@ -119,4 +127,38 @@ resource productApi 'Microsoft.App/containerApps@2022-11-01-preview' = {
   }
 }
 
-
+resource replicaMetricAlert 'Microsoft.Insights/metricAlerts@2018-03-01' = {
+  name: replicaCountExceededAlertName
+  location: 'global'
+  properties: {
+    criteria: {
+      allOf: [
+        {
+          threshold: 5
+          name: replicaCountExceededAlertName
+          metricNamespace: 'Microsoft.App/containerApps'
+          metricName: 'Replicas'
+          operator: 'GreaterThan'
+          timeAggregation: 'Maximum'
+          skipMetricValidation: false
+          criterionType: 'StaticThresholdCriterion'
+        }
+      ]
+      'odata.type': 'Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria'
+    }
+    actions: [
+      {
+        actionGroupId: actionGroup.id
+      }
+    ]
+    targetResourceRegion: location
+    targetResourceType: 'Microsoft.App/containerApps'
+    enabled: true
+    evaluationFrequency: 'PT1M'
+    scopes: [
+      productApi.id
+    ]
+    severity: 2
+    windowSize: 'PT5M'
+  }
+}
