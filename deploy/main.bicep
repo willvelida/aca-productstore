@@ -19,8 +19,9 @@ param containerAppEnvironmentName string = '${applicationName}env'
 @description('Specifies the name of the Azure Load Test resource')
 param loadTestName string = '${applicationName}loadtest'
 
+@maxLength(12)
 @description('The name of the Action Group that will receive alerts for this application')
-param actionGroupName string = 'Product Store Support Team'
+param actionGroupName string = 'PSOC team'
 
 @description('The Action Group Email')
 param actionGroupEmail string = 'willvelida@microsoft.com'
