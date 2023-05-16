@@ -19,6 +19,12 @@ param containerAppEnvironmentName string = '${applicationName}env'
 @description('Specifies the name of the Azure Load Test resource')
 param loadTestName string = '${applicationName}loadtest'
 
+@description('The name of the Action Group that will receive alerts for this application')
+param actionGroupName string = 'Product Store Support Team'
+
+@description('The Action Group Email')
+param actionGroupEmail string = 'willvelida@microsoft.com'
+
 var tags = {
   Environment: 'Production'
   ApplicationName: 'aca-productstore'
@@ -85,5 +91,21 @@ resource loadTest 'Microsoft.LoadTestService/loadTests@2022-12-01' = {
   location: location
   properties: {
     
+  }
+}
+
+resource supportTeamActionGroup 'Microsoft.Insights/actionGroups@2023-01-01' = {
+  name: actionGroupName
+  location: location
+  properties: {
+    enabled: true
+    groupShortName: actionGroupName
+    emailReceivers: [
+      {
+        name: actionGroupName
+        emailAddress: actionGroupEmail
+        useCommonAlertSchema: true
+      }
+    ]
   }
 }
