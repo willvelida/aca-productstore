@@ -96,7 +96,7 @@ resource loadTest 'Microsoft.LoadTestService/loadTests@2022-12-01' = {
 
 resource supportTeamActionGroup 'Microsoft.Insights/actionGroups@2023-01-01' = {
   name: actionGroupName
-  location: location
+  location: 'global'
   properties: {
     enabled: true
     groupShortName: actionGroupName
