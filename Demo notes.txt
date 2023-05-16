@@ -1,0 +1,20 @@
+Demo notes
+
+Blue Green Deployments
+
+- Show resources in Azure
+- Show API + health endpoint
+- Show Visual Studio solution
+- Deploy to Blue slot
+- Show Fields populated and switch to Green slot
+
+Demonstrate Bicep code
+- Core infrastructure (environment)
+- Container App Infra (show Container App code, metrics, scaling rules).
+
+Demonstrate Dapr Sample
+- Demonstrate front end
+- Show Dapr components in Container App environment
+- Show Dapr Components in Bicep Code.
+- Show state store items being added
+
