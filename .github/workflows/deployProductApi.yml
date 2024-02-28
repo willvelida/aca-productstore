@@ -45,14 +45,6 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-      - name: Get existing image
-        id: getimages
-        run: |
-          echo "Installing containerapp extension"
-          az extension add -n containerapp --yes
-          containerImage=$(az containerapp show --name store-product-api --resource-group ${{ secrets.AZURE_RG }} --query "properties.template.containers[0].image" -o tsv)  
-          echo "::set-output name=containerImage::$containerImage"
-
       - name: Run preflight validation
         uses: azure/arm-deploy@v1
         with:
@@ -60,7 +52,6 @@ jobs:
           resourceGroupName: ${{ secrets.AZURE_RG }}
           template: ./src/Store.ProductApi/Store.ProductApi.Infrastructure/main.bicep
           deploymentMode: Validate
-          parameters: containerImageName=${{ steps.getimages.outputs.containerImage }}
 
   preview:
     needs: [lint, validate]
@@ -74,19 +65,11 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-      - name: Get existing image
-        id: getimages
-        run: |
-            echo "Installing containerapp extension"
-            az extension add -n containerapp --yes
-            containerImage=$(az containerapp show --name store-product-api --resource-group ${{ secrets.AZURE_RG }} --query "properties.template.containers[0].image" -o tsv)  
-            echo "::set-output name=containerImage::$containerImage"
-
       - uses: Azure/cli@v1
         name: Run what-if
         with:
           inlineScript: |
-            az deployment group what-if --resource-group ${{ secrets.AZURE_RG }} --template-file ./src/Store.ProductApi/Store.ProductApi.Infrastructure/main.bicep --parameters containerImageName=${{ steps.getimages.outputs.containerImage }}
+            az deployment group what-if --resource-group ${{ secrets.AZURE_RG }} --template-file ./src/Store.ProductApi/Store.ProductApi.Infrastructure/main.bicep
   
   deploy-infra:
     runs-on: ubuntu-latest
@@ -101,14 +84,6 @@ jobs:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-
-      - name: Get existing image
-        id: getimages
-        run: |
-            echo "Installing containerapp extension"
-            az extension add -n containerapp --yes
-            containerImage=$(az containerapp show --name store-product-api --resource-group ${{ secrets.AZURE_RG }} --query "properties.template.containers[0].image" -o tsv)  
-            echo "::set-output name=containerImage::$containerImage"
   
       - name: Deploy Bicep Template
         uses: azure/arm-deploy@v1
@@ -117,7 +92,6 @@ jobs:
             resourceGroupName: ${{ secrets.AZURE_RG }}
             template: ./src/Store.ProductApi/Store.ProductApi.Infrastructure/main.bicep
             deploymentMode: Incremental
-            parameters: containerImageName=${{ steps.getimages.outputs.containerImage }}
 
   build-api-project:
     needs: [deploy-infra]
