@@ -17,7 +17,7 @@ param appInsightsName string = '${applicationName}ai'
 param containerAppEnvironmentName string = '${applicationName}env'
 
 @description('Specifies the name of the Azure Load Test resource')
-param loadTestName string = '${applicationName}loadtest'
+param loadTestName string = 'wvacaloadtest'
 
 @maxLength(12)
 @description('The name of the Action Group that will receive alerts for this application')
