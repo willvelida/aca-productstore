@@ -62,14 +62,6 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-      - name: Get existing image
-        id: getimages
-        run: |
-            echo "Installing containerapp extension"
-            az extension add -n containerapp --yes
-            containerImage=$(az containerapp show --name store-inventory-api --resource-group ${{ secrets.AZURE_RG }} --query "properties.template.containers[0].image" -o tsv)  
-            echo "::set-output name=containerImage::$containerImage"
-
       - uses: Azure/cli@v1
         name: Run what-if
         with:
