@@ -24,6 +24,7 @@ var products = new Faker<Product>()
     .RuleFor(p => p.ProductId, (f, p) => f.Database.Random.Guid())
     .RuleFor(p => p.ProductName, (f, p) => f.Commerce.ProductName())
     .RuleFor(p => p.Manufacturer, (f, p) => f.Company.CompanyName())
+    .RuleFor(p => p.UnitPrice, f => f.Random.Decimal(9.99m, 19.99m))
     .Generate(10);
 
 app.MapGet("/products", () => Results.Ok(products))
@@ -48,6 +49,7 @@ public class Product
     public Guid ProductId => Guid.NewGuid();
     public string ProductName { get; set; }
     public string Manufacturer { get; set; }
+    public decimal UnitPrice {get; set;}
 }
 
 // Make the implicit Program class public so test projects can access it
